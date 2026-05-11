@@ -1,0 +1,95 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ProductCategory {
+  Frozen
+  Meat
+  Vegetables
+  Greens
+  Spices
+  Groats
+  Canned
+  Liquid
+  Sweets
+}
+
+enum PreparationType {
+  ReadyToEat
+  SemiFinished
+  RequiresCooking
+}
+
+enum DishCategory {
+  Dessert
+  First
+  Second
+  Drink
+  Salad
+  Soup
+  Snack
+}
+
+model Product {
+  id              String          @id @default(cuid())
+  name            String
+  photos          String[]        @default([])
+  calories        Float
+  proteins        Float
+  fats            Float
+  carbs           Float
+  compositionText String?
+  category        ProductCategory
+  preparationType PreparationType
+  isVegan         Boolean         @default(false)
+  isGlutenFree    Boolean         @default(false)
+  isSugarFree     Boolean         @default(false)
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+
+  ingredients DishIngredient[]
+
+  @@index([name])
+  @@index([category])
+  @@index([preparationType])
+}
+
+model Dish {
+  id           String          @id @default(cuid())
+  name         String
+  photos       String[]        @default([])
+  calories     Float
+  proteins     Float
+  fats         Float
+  carbs        Float
+  portionSize  Float
+  category     DishCategory
+  isVegan      Boolean         @default(false)
+  isGlutenFree Boolean         @default(false)
+  isSugarFree  Boolean         @default(false)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  ingredients DishIngredient[]
+
+  @@index([name])
+  @@index([category])
+}
+
+model DishIngredient {
+  dishId    String
+  productId String
+  grams     Float
+
+  dish    Dish    @relation(fields: [dishId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id], onDelete: Restrict)
+
+  @@id([dishId, productId])
+  @@index([productId])
+}

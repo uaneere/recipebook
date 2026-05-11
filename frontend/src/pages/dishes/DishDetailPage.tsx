@@ -85,6 +85,7 @@ export function DishDetailPage() {
       <section className="card stack gap12">
         <div className="stack gap8">
           <div className="label">Фото</div>
+
           {item.photos.length === 0 ? (
             <div className="muted">Нет фото</div>
           ) : (
@@ -94,7 +95,12 @@ export function DishDetailPage() {
                   key={`${url}-${idx}`}
                   src={url}
                   alt={`${item.name} photo ${idx + 1}`}
-                  style={{ width: 180, height: 120, objectFit: "cover", borderRadius: 8 }}
+                  style={{
+                    width: 180,
+                    height: 120,
+                    objectFit: "cover",
+                    borderRadius: 8
+                  }}
                   onError={(e) => {
                     const img = e.currentTarget;
                     img.style.display = "none";
@@ -105,24 +111,42 @@ export function DishDetailPage() {
           )}
         </div>
 
-        <div className="grid grid4 gap12">
-          <div className="stat">
-            <div className="muted">ккал/100г</div>
-            <div className="big">{Math.round((item.calories / item.portionSize) * 100)}</div>
-          </div>
-          <div className="stat">
-            <div className="muted">Белки/100г</div>
-            <div className="big">{Math.round((item.proteins / item.portionSize) * 100 * 10) / 10}</div>
-          </div>
-          <div className="stat">
-            <div className="muted">Жиры/100г</div>
-            <div className="big">{Math.round((item.fats / item.portionSize) * 100 * 10) / 10}</div>
-          </div>
-          <div className="stat">
-            <div className="muted">Углеводы/100г</div>
-            <div className="big">{Math.round((item.carbs / item.portionSize) * 100 * 10) / 10}</div>
-          </div>
-        </div>
+        {}
+        {(() => {
+          const factor = item.portionSize / 100;
+
+          return (
+            <div className="grid grid4 gap12">
+              <div className="stat">
+                <div className="muted">ккал/порц.</div>
+                <div className="big">
+                  {Math.round(item.calories * factor)}
+                </div>
+              </div>
+
+              <div className="stat">
+                <div className="muted">Белки</div>
+                <div className="big">
+                  {Math.round(item.proteins * factor)}
+                </div>
+              </div>
+
+              <div className="stat">
+                <div className="muted">Жиры</div>
+                <div className="big">
+                  {Math.round(item.fats * factor)}
+                </div>
+              </div>
+
+              <div className="stat">
+                <div className="muted">Углеводы</div>
+                <div className="big">
+                  {Math.round(item.carbs * factor)}
+                </div>
+              </div>
+            </div>
+          );
+        })()}
 
         <div className="row wrap gap16">
           <span className={item.isVegan ? "badge" : "badge off"}>Веган</span>
@@ -133,28 +157,6 @@ export function DishDetailPage() {
         <div className="row spaceBetween alignCenter">
           <div className="label">Размер порции</div>
           <div className="strong">{item.portionSize}г</div>
-        </div>
-      </section>
-
-      <section className="card stack gap12">
-        <div className="row spaceBetween alignCenter">
-          <div className="label">Ингредиенты</div>
-          <div className="muted">{item.ingredients.length} ингредиентов</div>
-        </div>
-
-        <div className="table">
-          <div className="thead" style={{ gridTemplateColumns: "1.2fr 0.6fr 0.6fr" }}>
-            <div>Продукт</div>
-            <div className="num">грамм</div>
-            <div className="num">ккал/100г</div>
-          </div>
-          {item.ingredients.map((ing) => (
-            <div key={ing.product.id} className="trow" style={{ gridTemplateColumns: "1.2fr 0.6fr 0.6fr" }}>
-              <div className="strong">{ing.product.name}</div>
-              <div className="num">{ing.grams}</div>
-              <div className="num">{Math.round(ing.product.calories)}</div>
-            </div>
-          ))}
         </div>
       </section>
 

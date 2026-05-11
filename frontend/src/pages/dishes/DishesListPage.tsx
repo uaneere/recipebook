@@ -142,35 +142,43 @@ export function DishesListPage() {
       </section>
 
       {error && <div className="alert error">{error}</div>}
-
-      <section className="card">
+      
+     <section className="card">
         {loading ? (
           <div className="muted">Загрузка…</div>
         ) : items.length === 0 ? (
           <div className="muted">Блюда не найдены.</div>
         ) : (
           <div className="table">
-            <div className="thead" style={{ gridTemplateColumns: "1.2fr repeat(4, 0.6fr)" }}>
+            <div
+              className="thead"
+              style={{ gridTemplateColumns: "1.2fr repeat(4, 0.6fr)" }}
+            >
               <div>Название</div>
-              <div className="num">ккал/порцию</div>
+              <div className="num">ккал/порц.</div>
               <div className="num">Б</div>
               <div className="num">Ж</div>
               <div className="num">У</div>
             </div>
-            {items.map((d) => (
-              <Link
-                key={d.id}
-                className="trow"
-                style={{ gridTemplateColumns: "1.2fr repeat(4, 0.6fr)" }}
-                to={`/dishes/${d.id}`}
-              >
-                <div className="strong">{d.name}</div>
-                <div className="num">{d.calories}</div>
-                <div className="num">{d.proteins}</div>
-                <div className="num">{d.fats}</div>
-                <div className="num">{d.carbs}</div>
-              </Link>
-            ))}
+
+            {items.map((d) => {
+              const factor = (d.portionSize ?? 100) / 100;
+
+              return (
+                <Link
+                  key={d.id}
+                  className="trow"
+                  style={{ gridTemplateColumns: "1.2fr repeat(4, 0.6fr)" }}
+                  to={`/dishes/${d.id}`}
+                >
+                  <div className="strong">{d.name}</div>
+                  <div className="num">{Math.round(d.calories * factor)}</div>
+                  <div className="num">{Math.round(d.proteins * factor)}</div>
+                  <div className="num">{Math.round(d.fats * factor)}</div>
+                  <div className="num">{Math.round(d.carbs * factor)}</div>
+                </Link>
+              );
+            })}
           </div>
         )}
       </section>

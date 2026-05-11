@@ -130,7 +130,10 @@ export function DishFormPage() {
     }
 
     let cancelled = false;
-    calculateNutrition(normalizedIngredients)
+    calculateNutrition(
+      normalizedIngredients,
+      form.portionSize
+    )
       .then((r) => {
         if (cancelled) return;
         setAllowed(r.allowedFlags);
@@ -138,10 +141,10 @@ export function DishFormPage() {
         
         if (!hasCustomNutrition && !manualMode) {
           setManualNutrition({
-            calories: roundToTwoDecimals(r.draftNutrition.calories * form.portionSize / 100),
-            proteins: roundToTwoDecimals(r.draftNutrition.proteins * form.portionSize / 100),
-            fats: roundToTwoDecimals(r.draftNutrition.fats * form.portionSize / 100),
-            carbs: roundToTwoDecimals(r.draftNutrition.carbs * form.portionSize / 100)
+            calories: r.draftNutrition.calories,
+            proteins: r.draftNutrition.proteins,
+            fats: r.draftNutrition.fats,
+            carbs: r.draftNutrition.carbs
           });
         }
         
@@ -227,29 +230,32 @@ export function DishFormPage() {
     try {
       const useCustomValues = hasCustomNutrition;
       
-      const factor = form.portionSize / 100;
-      
       const payload = {
         name: form.name,
+        photos: form.photos,
         portionSize: form.portionSize,
         category: form.category as any,
-        photos: form.photos,
         ingredients: normalizedIngredients,
+
         isVegan: form.isVegan,
         isGlutenFree: form.isGlutenFree,
         isSugarFree: form.isSugarFree,
-        calories: useCustomValues 
-          ? manualNutrition.calories 
-          : roundToTwoDecimals(calculatedNutrition.calories * factor),
-        proteins: useCustomValues 
-          ? manualNutrition.proteins 
-          : roundToTwoDecimals(calculatedNutrition.proteins * factor),
-        fats: useCustomValues 
-          ? manualNutrition.fats 
-          : roundToTwoDecimals(calculatedNutrition.fats * factor),
-        carbs: useCustomValues 
-          ? manualNutrition.carbs 
-          : roundToTwoDecimals(calculatedNutrition.carbs * factor)
+
+        calories: useCustomValues
+          ? manualNutrition.calories
+          : calculatedNutrition.calories,
+
+        proteins: useCustomValues
+          ? manualNutrition.proteins
+          : calculatedNutrition.proteins,
+
+        fats: useCustomValues
+          ? manualNutrition.fats
+          : calculatedNutrition.fats,
+
+        carbs: useCustomValues
+          ? manualNutrition.carbs
+          : calculatedNutrition.carbs
       };
 
       if (editing && id) {

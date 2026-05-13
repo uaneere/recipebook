@@ -27,6 +27,8 @@
   },
   "homepage": "https://github.com/uaneere/recipe-book#readme",
   "devDependencies": {
+    "@types/jest": "^30.0.0",
+    "@vitest/coverage-v8": "^4.1.6",
     "concurrently": "^9.2.1"
   }
 }

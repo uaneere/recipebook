@@ -92,12 +92,12 @@ export async function createDish(input: CreateDishInput) {
 
     const nutritionPer100g = await calculateNutrition(ingredients);
     const calculatedPerPortion = calculatePerPortion(nutritionPer100g, input.portionSize);
-    
+
     const finalNutrition = {
-      calories: input.calories !== undefined ? round2(input.calories) : calculatedPerPortion.calories,
-      proteins: input.proteins !== undefined ? round2(input.proteins) : calculatedPerPortion.proteins,
-      fats: input.fats !== undefined ? round2(input.fats) : calculatedPerPortion.fats,
-      carbs: input.carbs !== undefined ? round2(input.carbs) : calculatedPerPortion.carbs
+      calories: input.calories !== undefined ? round2(input.calories) : round2(nutritionPer100g.calories * input.portionSize / 100),
+      proteins: input.proteins !== undefined ? round2(input.proteins) : round2(nutritionPer100g.proteins * input.portionSize / 100),
+      fats: input.fats !== undefined ? round2(input.fats) : round2(nutritionPer100g.fats * input.portionSize / 100),
+      carbs: input.carbs !== undefined ? round2(input.carbs) : round2(nutritionPer100g.carbs * input.portionSize / 100)
     };
 
     const dish = await prisma.dish.create({
@@ -160,10 +160,10 @@ export async function updateDish(id: string, input: UpdateDishInput) {
     assertFlagAllowed("isSugarFree", input.isSugarFree, allowedFlags.isSugarFree);
 
     const finalNutrition = {
-      calories: input.calories !== undefined ? round2(input.calories) : calculatedPerPortion.calories,
-      proteins: input.proteins !== undefined ? round2(input.proteins) : calculatedPerPortion.proteins,
-      fats: input.fats !== undefined ? round2(input.fats) : calculatedPerPortion.fats,
-      carbs: input.carbs !== undefined ? round2(input.carbs) : calculatedPerPortion.carbs
+      calories: input.calories !== undefined ? round2(input.calories) : round2(nutritionPer100g.calories * portionSize / 100),
+      proteins: input.proteins !== undefined ? round2(input.proteins) : round2(nutritionPer100g.proteins * portionSize / 100),
+      fats: input.fats !== undefined ? round2(input.fats) : round2(nutritionPer100g.fats * portionSize / 100),
+      carbs: input.carbs !== undefined ? round2(input.carbs) : round2(nutritionPer100g.carbs * portionSize / 100)
     };
 
     const dish = await prisma.dish.update({
@@ -208,9 +208,5 @@ export async function deleteDish(id: string) {
 
 export async function calculateDishNutrition(ingredients: DishIngredientInput[], portionSize?: number) {
   const per100g = await calculateNutrition(ingredients);
-  if (portionSize) {
-    const perPortion = calculatePerPortion(per100g, portionSize);
-    return { draftNutrition: perPortion, allowedFlags: await resolveAllowedFlags(ingredients) };
-  }
   return { draftNutrition: per100g, allowedFlags: await resolveAllowedFlags(ingredients) };
 }

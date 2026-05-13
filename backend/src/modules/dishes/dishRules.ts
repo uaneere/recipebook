@@ -52,8 +52,7 @@ export function calculateNutritionPerPortion(
 }
 
 export async function calculateNutrition(
-  ingredients: DishIngredientInput[],
-  portionSize?: number
+  ingredients: DishIngredientInput[]
 ): Promise<Nutrition> {
   const productIds = ingredients.map((i) => i.productId);
   const products = await prisma.product.findMany({
@@ -73,19 +72,7 @@ export async function calculateNutrition(
   }
 
   const byId = new Map(products.map((p) => [p.id, p]));
-  const per100g = calculateNutritionFromProducts(ingredients, byId);
-  
-  if (portionSize && portionSize > 0) {
-    const factor = portionSize / 100;
-    return {
-      calories: round2(per100g.calories * factor),
-      proteins: round2(per100g.proteins * factor),
-      fats: round2(per100g.fats * factor),
-      carbs: round2(per100g.carbs * factor)
-    };
-  }
-  
-  return per100g;
+  return calculateNutritionFromProducts(ingredients, byId);
 }
 
 export type AllowedFlags = { isVegan: boolean; isGlutenFree: boolean; isSugarFree: boolean };

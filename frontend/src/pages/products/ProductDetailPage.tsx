@@ -76,7 +76,9 @@ export function ProductDetailPage() {
           </div>
           <div className="muted" style={{ fontSize: 14 }}>
             Создан: {new Date(item.createdAt).toLocaleString()}
-            {item.updatedAt ? ` · Обновлён: ${new Date(item.updatedAt).toLocaleString()}` : ""}
+            {item.updatedAt && item.updatedAt !== item.createdAt 
+              ? ` · Обновлён: ${new Date(item.updatedAt).toLocaleString()}` 
+              : ""}
           </div>
         </div>
 

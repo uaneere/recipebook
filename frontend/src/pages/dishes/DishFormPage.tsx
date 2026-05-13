@@ -130,10 +130,7 @@ export function DishFormPage() {
     }
 
     let cancelled = false;
-    calculateNutrition(
-      normalizedIngredients,
-      form.portionSize
-    )
+    calculateNutrition(normalizedIngredients)
       .then((r) => {
         if (cancelled) return;
         setAllowed(r.allowedFlags);
@@ -376,7 +373,7 @@ export function DishFormPage() {
 
         <section className="stack gap8">
           <div className="row spaceBetween alignCenter">
-            <div className="label">Пищевая ценность (на 100г)</div>
+            <div className="label">Пищевая ценность</div>
             <div className="row gap8">
               {manualMode ? (
                 <>

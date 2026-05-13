@@ -162,7 +162,6 @@ export function DishesListPage() {
             </div>
 
             {items.map((d) => {
-              const factor = (d.portionSize ?? 100) / 100;
 
               return (
                 <Link
@@ -172,10 +171,10 @@ export function DishesListPage() {
                   to={`/dishes/${d.id}`}
                 >
                   <div className="strong">{d.name}</div>
-                  <div className="num">{Math.round(d.calories * factor)}</div>
-                  <div className="num">{Math.round(d.proteins * factor)}</div>
-                  <div className="num">{Math.round(d.fats * factor)}</div>
-                  <div className="num">{Math.round(d.carbs * factor)}</div>
+                  <div className="num">{d.calories}</div>
+                  <div className="num">{d.proteins}</div>
+                  <div className="num">{d.fats}</div>
+                  <div className="num">{d.carbs}</div>
                 </Link>
               );
             })}

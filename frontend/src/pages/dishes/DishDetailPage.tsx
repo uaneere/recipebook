@@ -67,7 +67,9 @@ export function DishDetailPage() {
           <div className="muted">{labelDishCategory(item.category)}</div>
           <div className="muted" style={{ fontSize: 14 }}>
             Создано: {new Date(item.createdAt).toLocaleString()}
-            {item.updatedAt ? ` · Обновлено: ${new Date(item.updatedAt).toLocaleString()}` : ""}
+            {item.updatedAt && item.updatedAt !== item.createdAt 
+              ? ` · Обновлено: ${new Date(item.updatedAt).toLocaleString()}` 
+              : ""}
           </div>
         </div>
         <div className="row gap8">
@@ -113,35 +115,34 @@ export function DishDetailPage() {
 
         {}
         {(() => {
-          const factor = item.portionSize / 100;
 
           return (
             <div className="grid grid4 gap12">
               <div className="stat">
                 <div className="muted">ккал/порц.</div>
                 <div className="big">
-                  {Math.round(item.calories * factor)}
+                  {item.calories}
                 </div>
               </div>
 
               <div className="stat">
                 <div className="muted">Белки</div>
                 <div className="big">
-                  {Math.round(item.proteins * factor)}
+                  {item.proteins}
                 </div>
               </div>
 
               <div className="stat">
                 <div className="muted">Жиры</div>
                 <div className="big">
-                  {Math.round(item.fats * factor)}
+                  {item.fats}
                 </div>
               </div>
 
               <div className="stat">
                 <div className="muted">Углеводы</div>
                 <div className="big">
-                  {Math.round(item.carbs * factor)}
+                  {item.carbs}
                 </div>
               </div>
             </div>

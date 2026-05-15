@@ -1,4 +1,5 @@
-import { prisma } from "../../db";
+import { Request } from "express";
+import { getPrisma } from "../../db";
 import { Prisma } from "../../generated/prisma/client";
 import { ApiError } from "../../shared/apiError";
 import { applyDishNameMacro } from "./dishMacros";
@@ -24,7 +25,8 @@ function calculatePerPortion(per100g: { calories: number; proteins: number; fats
   };
 }
 
-export async function listDishes(query: DishListQuery) {
+export async function listDishes(query: DishListQuery, req?: Request) {
+  const prisma = getPrisma(req);
   const where: Prisma.DishWhereInput = {};
 
   if (query.q) where.name = { contains: query.q, mode: "insensitive" };
@@ -44,7 +46,8 @@ export async function listDishes(query: DishListQuery) {
   return prisma.dish.findMany({ where, orderBy });
 }
 
-export async function getDish(id: string) {
+export async function getDish(id: string, req?: Request) {
+  const prisma = getPrisma(req);
   const dish = await prisma.dish.findUnique({
     where: { id },
     include: {
@@ -74,7 +77,9 @@ function assertFlagAllowed(
   }
 }
 
-export async function createDish(input: CreateDishInput) {
+export async function createDish(input: CreateDishInput, req?: Request) {
+  const prisma = getPrisma(req);
+  
   try {
     const macro = applyDishNameMacro(input.name);
     const name = macro.name;
@@ -123,14 +128,18 @@ export async function createDish(input: CreateDishInput) {
     
     return { dish, draftNutrition, allowedFlags };
   } catch (err) {
-    if (err instanceof Error && err.message.includes("Название блюда должно содержать")) {
+    if (err instanceof Error && 
+        (err.message.includes("Название блюда должно содержать") || 
+         err.message.includes("не может состоять только из макросов"))) {
       throw new ApiError({ status: 400, code: "VALIDATION_ERROR", message: err.message });
     }
     throw err;
   }
 }
 
-export async function updateDish(id: string, input: UpdateDishInput) {
+export async function updateDish(id: string, input: UpdateDishInput, req?: Request) {
+  const prisma = getPrisma(req);
+  
   const existing = await prisma.dish.findUnique({
     where: { id },
     include: { ingredients: { select: { productId: true, grams: true } } }
@@ -199,14 +208,15 @@ export async function updateDish(id: string, input: UpdateDishInput) {
   }
 }
 
-export async function deleteDish(id: string) {
+export async function deleteDish(id: string, req?: Request) {
+  const prisma = getPrisma(req);
   await prisma.dish.delete({ where: { id } }).catch(() => {
     throw new ApiError({ status: 404, code: "NOT_FOUND", message: "Блюдо не найдено" });
   });
   return { ok: true };
 }
 
-export async function calculateDishNutrition(ingredients: DishIngredientInput[], portionSize?: number) {
+export async function calculateDishNutrition(ingredients: DishIngredientInput[], portionSize?: number, req?: Request) {
   const per100g = await calculateNutrition(ingredients);
   return { draftNutrition: per100g, allowedFlags: await resolveAllowedFlags(ingredients) };
 }

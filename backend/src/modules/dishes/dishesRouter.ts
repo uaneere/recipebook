@@ -16,7 +16,7 @@ export const dishesRouter = Router();
 dishesRouter.get("/", async (req, res, next) => {
   try {
     const query = parseQuery(req, DishListQuerySchema);
-    const dishes = await listDishes(query);
+    const dishes = await listDishes(query, req);
     res.json(dishes);
   } catch (err) {
     next(err);
@@ -26,7 +26,7 @@ dishesRouter.get("/", async (req, res, next) => {
 dishesRouter.post("/calculate-nutrition", async (req, res, next) => {
   try {
     const input = parseBody(req, CalculateNutritionSchema);
-    const result = await calculateDishNutrition(input.ingredients, input.portionSize);
+    const result = await calculateDishNutrition(input.ingredients, input.portionSize, req);
     res.json(result);
   } catch (err) {
     next(err);
@@ -36,7 +36,7 @@ dishesRouter.post("/calculate-nutrition", async (req, res, next) => {
 dishesRouter.post("/", async (req, res, next) => {
   try {
     const input = parseBody(req, CreateDishSchema);
-    const result = await createDish(input);
+    const result = await createDish(input, req);
     res.status(201).json(result);
   } catch (err) {
     next(err);
@@ -46,7 +46,7 @@ dishesRouter.post("/", async (req, res, next) => {
 dishesRouter.get("/:id", async (req, res, next) => {
   try {
     const id = z.string().parse(req.params.id);
-    const dish = await getDish(id);
+    const dish = await getDish(id, req);
     res.json(dish);
   } catch (err) {
     next(err);
@@ -57,7 +57,7 @@ dishesRouter.patch("/:id", async (req, res, next) => {
   try {
     const id = z.string().parse(req.params.id);
     const input = parseBody(req, UpdateDishSchema);
-    const result = await updateDish(id, input);
+    const result = await updateDish(id, input, req);
     res.json(result);
   } catch (err) {
     next(err);
@@ -67,7 +67,7 @@ dishesRouter.patch("/:id", async (req, res, next) => {
 dishesRouter.delete("/:id", async (req, res, next) => {
   try {
     const id = z.string().parse(req.params.id);
-    const result = await deleteDish(id);
+    const result = await deleteDish(id, req);
     res.json(result);
   } catch (err) {
     next(err);

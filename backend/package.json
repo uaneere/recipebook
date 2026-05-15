@@ -11,8 +11,9 @@
     "db:seed": "prisma db seed",
     "lint": "eslint .",
     "test": "vitest run",
-    "test:coverage": "vitest run --coverage",
-    "test:watch": "vitest"
+    "test:unit": "vitest run test/dishRules.unit.test.ts",
+    "test:api": "vitest run test/api.integration.test.ts",
+    "test:integration": "vitest run test/dishRules.integration.test.ts"
   },
   "keywords": [],
   "author": "",
@@ -21,7 +22,7 @@
   "dependencies": {
     "@prisma/client": "^6.19.3",
     "@types/multer": "^2.1.0",
-    "cors": "^2.8.5",
+    "cors": "^2.8.6",
     "dotenv": "^17.2.2",
     "express": "^5.1.0",
     "multer": "^2.1.1",

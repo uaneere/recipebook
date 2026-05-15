@@ -10,6 +10,13 @@ services:
       - "5432:5432"
     volumes:
       - recipe_book_pgdata:/var/lib/postgresql/data
+    command: |
+      bash -c "
+        docker-entrypoint.sh postgres &
+        sleep 5
+        psql -U recipe -d recipebook -c 'CREATE DATABASE recipebook_test;'
+        wait
+      "
 
 volumes:
   recipe_book_pgdata:

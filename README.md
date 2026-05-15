@@ -78,20 +78,32 @@ npm run build
 
 ## 8) Тесты
 
-### Все тесты (backend + frontend unit)
+### Все тесты (backend + frontend)
 
 ```bash
-npm test
+npm run test
 ```
 
-### Только backend unit/API (Vitest)
+### Backend unit
 
 ```bash
-npm run test -w backend
+cd backend
+npm run test:unit
 ```
 
-### Только frontend unit (Vitest)
-
+### Backend integration (без изоляции)
 ```bash
-npm run test -w frontend
+cd backend
+npm run test:api
+npm run test:integration
+```
+
+### Frontend e2e
+В первом терминале:
+```bash
+NODE_ENV=test npm run dev:backend
+```
+Во втором терминале:
+```bash
+npm run test:e2e
 ```

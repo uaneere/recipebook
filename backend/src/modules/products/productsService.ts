@@ -1,10 +1,12 @@
-import { prisma } from "../../db";
-import { Prisma } from "../../generated/prisma/client";
+import { Request } from "express";
+import { getPrisma } from "../../db";
 import { ApiError } from "../../shared/apiError";
 import { applyProductNameMacro } from "./productMacros";
 import { type CreateProductSchema, type ProductListQuerySchema, type UpdateProductSchema } from "./types";
 
-export async function createProduct(input: CreateProductSchema) {
+export async function createProduct(input: CreateProductSchema, req?: Request) {
+  const prisma = getPrisma(req);
+  
   try {
     const macro = applyProductNameMacro(input.name);
     const name = macro.name;
@@ -21,8 +23,9 @@ export async function createProduct(input: CreateProductSchema) {
   }
 }
 
-export async function listProducts(query: ProductListQuerySchema) {
-  const where: Prisma.ProductWhereInput = {};
+export async function listProducts(query: ProductListQuerySchema, req?: Request) {
+  const prisma = getPrisma(req);
+  const where: any = {};
 
   if (query.q) {
     where.name = { contains: query.q, mode: "insensitive" };
@@ -34,22 +37,24 @@ export async function listProducts(query: ProductListQuerySchema) {
   if (query.isGlutenFree === true) where.isGlutenFree = true;
   if (query.isSugarFree === true) where.isSugarFree = true;
 
-  const orderBy =
-    query.sortBy === "name"
-      ? { name: query.sortDir }
-      : { [query.sortBy]: query.sortDir as "asc" | "desc" };
+  const orderBy = query.sortBy === "name"
+    ? { name: query.sortDir }
+    : { [query.sortBy]: query.sortDir as "asc" | "desc" };
 
   return prisma.product.findMany({ where, orderBy });
 }
 
-export async function getProduct(id: string) {
+export async function getProduct(id: string, req?: Request) {
+  const prisma = getPrisma(req);
   const product = await prisma.product.findUnique({ where: { id } });
   if (!product) throw new ApiError({ status: 404, code: "NOT_FOUND", message: "Продукт не найден" });
   return product;
 }
 
-export async function updateProduct(id: string, input: UpdateProductSchema) {
-  await getProduct(id);
+export async function updateProduct(id: string, input: UpdateProductSchema, req?: Request) {
+  const prisma = getPrisma(req);
+  await getProduct(id, req);
+  
   try {
     const macro = input.name ? applyProductNameMacro(input.name) : null;
     const name = macro ? macro.name : undefined;
@@ -63,8 +68,9 @@ export async function updateProduct(id: string, input: UpdateProductSchema) {
   }
 }
 
-export async function deleteProduct(id: string) {
-  await getProduct(id);
+export async function deleteProduct(id: string, req?: Request) {
+  const prisma = getPrisma(req);
+  await getProduct(id, req);
 
   const usedIn = await prisma.dishIngredient.findMany({
     where: { productId: id },
@@ -76,7 +82,7 @@ export async function deleteProduct(id: string) {
       status: 409,
       code: "PRODUCT_IN_USE",
       message: "Нельзя удалить продукт: он используется в блюдах",
-      details: { dishes: usedIn.map((x: (typeof usedIn)[number]) => x.dish) }
+      details: { dishes: usedIn.map((x: any) => x.dish) }
     });
   }
 
